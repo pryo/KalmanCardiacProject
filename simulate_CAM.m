@@ -69,7 +69,7 @@ addpath(genpath(pwd));
 if mod(length(varargin),2), error('Initialization error');end
 if nargin == 0, class = 'plane'; end
 if nargin < 2, W = 10; end 
-if nargin < 3, W_e = 2; end 
+if nargin < 3, W_e = 10; end 
 if nargin < 4, sim_time  = 3; end
 
 % Tissue dimensions
@@ -342,7 +342,7 @@ save('KalmanResult.mat','kalmanResult');
 
 
 %%   VIDEO
-
+save('VIP.mat','VIP');
 if nargout==0
     if ~isempty(transfer_matrix)
         video_CAM(TMP,VIP,transfer_matrix(:,1),CardiacSignal(1,:),FsSignal,FsSignal/10);
