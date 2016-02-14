@@ -77,9 +77,9 @@ for nT=1:nn:length(V(1,:))-10
     title('Simulated voltage')
     
     figure(fa);subplot(222)
-    Vsurf = reshape(double(V(:,nT)),W,W);
+    Vsurf = reshape(double(VIP(:,nT)),W,W);%it seems to be error that it should be VIP
     surf(x,y,Vsurf)
-    view(0,90)
+    view(45,45)%try to look at the plot from differernt prespective
     shading interp
     axis square
     caxis([mmIP mxIP]);
