@@ -1,16 +1,16 @@
-function state_kf = kf (transfer_matrix,state)
+function state_kf = kf (A,B,U,transfer_matrix,state,Q,R,V)
 nodeNum = size(transfer_matrix,1);
 w = sqrt(nodeNum);
 cellNum = size(state,1);
 time=size(state,2); %the length of state sequence over time
-Q = zeros(cellNum,cellNum);%process noise is 0
-R=zeros(nodeNum,nodeNum);%obsevation noise is zero
-W=0;
-V=zeros(nodeNum,1);%observation erro will be zero for now
+%Q = zeros(cellNum,cellNum);%process noise is 0
+%R=zeros(nodeNum,nodeNum);%obsevation noise is zero
+%W=0;
+%V=zeros(nodeNum,1);%observation erro will be zero for now
 %process model
-A = eye(cellNum); %process matirx
-B = eye(cellNum)'; % input control matrix
-U = zeros(cellNum,1); % no stimulus from outside, if it does, it will be in the form of state vector
+%A = eye(cellNum); %process matirx
+%B = eye(cellNum)'; % input control matrix
+%U = zeros(cellNum,1); % no stimulus from outside, if it does, it will be in the form of state vector
 H = transfer_matrix;
 %X = zeros(cellNum,time);% true state stroage sequence
 X = state;%assign the state sequence to the model
@@ -26,7 +26,7 @@ I = eye(cellNum);
 
 for k=2:time
     
-    Z(:,k)= H*X(:,k)+V;%ovservation vector for one time instance
+    Z(:,k)= H*X(:,k)+V(k);%ovservation vector for one time instance
     %kalman filtering
     X_pre=A*Xkf(:,k-1)+B*U;% prediction of state
     P_pre = A*P0*A'+Q;% prediction of covriance

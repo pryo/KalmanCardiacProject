@@ -68,9 +68,9 @@ addpath(genpath(pwd));
 
 if mod(length(varargin),2), error('Initialization error');end
 if nargin == 0, class = 'plane'; end
-if nargin < 2, W = 10; end 
-if nargin < 3, W_e = 10; end 
-if nargin < 4, sim_time  = 3; end
+if nargin < 2, W = 32; end 
+if nargin < 3, W_e = 8; end 
+if nargin < 4, sim_time  = 1; end
 
 % Tissue dimensions
 tissue_size = W*W;
@@ -336,9 +336,9 @@ save('actual signal.mat','V_frame');
 % axis([0 2000 0.99 1]);
 toc
 
-%% kalman
-kalmanResult=kf(transfer_matrix,V_frame);
-save('KalmanResult.mat','kalmanResult');
+% %% kalman
+% kalmanResult=kf(transfer_matrix,V_frame);
+% save('KalmanResult.mat','kalmanResult');
 
 
 %%   VIDEO
