@@ -36,7 +36,7 @@ function  [EGM, VT]  = simulate_CAM(class,W,W_e,sim_time,varargin)
 %   'sim_time' is the simulated time
 %           By default sim_time=2 s
 %
-%   For the remaining input arguments (not described) see below:
+%   for the remaining input arguments (not described) see below:
 %
 %       simulate_EGM(class,W,W_e,sim_time, ...
 %                   'PropertyName',PropertyValue ...)
@@ -68,8 +68,8 @@ addpath(genpath(pwd));
 
 if mod(length(varargin),2), error('Initialization error');end
 if nargin == 0, class = 'plane'; end
-if nargin < 2, W = 32; end 
-if nargin < 3, W_e = 8; end 
+if nargin < 2, W = 16; end 
+if nargin < 3, W_e = 12; end 
 if nargin < 4, sim_time  = 1; end
 
 % Tissue dimensions

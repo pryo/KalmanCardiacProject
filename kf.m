@@ -1,4 +1,4 @@
-function state_kf = kf (A,B,U,transfer_matrix,state,Q,R,V)
+function [err_P,measure,state_kf] = kf (A,B,U,transfer_matrix,state,Q,R,V)
 nodeNum = size(transfer_matrix,1);
 w = sqrt(nodeNum);
 cellNum = size(state,1);
@@ -15,11 +15,13 @@ H = transfer_matrix;
 %X = zeros(cellNum,time);% true state stroage sequence
 X = state;%assign the state sequence to the model
 %X(:,1) = reshape(reshape([ones(w),ones(cellNum-w)],w,w),cellNum,1);%initialize the tissue
-P0 = 0.25*eye(cellNum);% covriance matrix
+P0 = [10 0;0 1];
+%P0 = 0.25*eye(cellNum);% covriance matrix
 Z = zeros(nodeNum,time);%the observation sequence
 Z(:,1)= H*X(:,1); %initialize observation
 Xkf = zeros(cellNum,time);% state estimate initialize
-Xkf(:,1) = X(:,1);
+%Xkf(:,1) = zeros(size(X(:,1)));
+Xkf(:,1) = state(:,1);
 err_P = zeros(time,cellNum);
 err_P(1,:) = (P0*ones(cellNum,1));%initialize the error overtime
 I = eye(cellNum);
@@ -36,6 +38,7 @@ for k=2:time
     err_P(k,:) = (P0*ones(cellNum,1));%store the error covariance
 end
 state_kf=Xkf;
+measure = Z;
 end
     
     

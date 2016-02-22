@@ -82,7 +82,7 @@ for nT=1:nn:length(V(1,:))-10
     view(45,45)%try to look at the plot from differernt prespective
     shading interp
     axis square
-    caxis([mmIP mxIP]);
+    caxis([-50 50]);% 50 above seems unused
     colorbar
     axis([0 W-1 0 W-1]);
     title('Estimated (IP) voltage')
