@@ -2,13 +2,13 @@ tic
 N = 1000;
 time = 1:1:N;
 X =zeros(2,N);
-seudoA = [0 1.5;1.5 0];
+seudoA = [0 1;1 0];
 A = [1,1;0,1];%process model for freefall
 X(:,1) = [95;1];%initial state height 95m, speed 1m/s
 B=[0.5;1];
 U=-1;
-Q=[1,0;0,1]; %process noise covariance;
-R = 1;%observation covariance
+Q=[10,0;0,10]; %process noise covariance;
+R = 0;%observation noise covariance
 W = sqrt(Q)*randn(2,N);%process noise
 V=sqrt(R)*randn(1,N);%observation noise
 for k=2:N

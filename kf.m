@@ -25,9 +25,13 @@ Xkf(:,1) = state(:,1);
 err_P = zeros(time,cellNum);
 err_P(1,:) = (P0*ones(cellNum,1));%initialize the error overtime
 I = eye(cellNum);
-
+covA =1;
+randomA=sqrt(covA)*randn(2,2,time);
+covB =1;
+randomB=sqrt(covB)*randn(2,1,time);
 for k=2:time
-    
+    A = [1,1;0,1]+randomA(:,:,k);
+    B = [0.5;1]+randomB(:,:,k);
     Z(:,k)= H*X(:,k)+V(k);%ovservation vector for one time instance
     %kalman filtering
     X_pre=A*Xkf(:,k-1)+B*U;% prediction of state
