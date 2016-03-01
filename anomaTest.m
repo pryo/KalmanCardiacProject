@@ -1,0 +1,22 @@
+%     A = [1,1;0,1];
+%     B = [0.5;1];
+%     Z(:,k)= H*X(:,k)+V(k);%ovservation vector for one time instance
+%     %kalman filtering
+%     X_pre=A*Xkf(:,k-1)+B*U;% prediction of state
+%     P_pre = A*P0*A'+Q;% prediction of covriance
+%     Kg = P_pre*H'*inv(H*P_pre*H'+R);%kalman gain
+%     Xkf(:,k)= X_pre+Kg*(Z(k)-H*X_pre);%state innovation
+%     P0=(I-Kg*H)*P_pre;%covariance innovation
+%     err_P(k,:) = (P0*ones(cellNum,1));%store the error covariance
+I = eye(2);
+P0 = [20 0;0 0.001];
+X_pre =[100;100];
+Q=[20 0;0 0];
+A = [1,1;0,1];
+H = [1 0];
+R = 10;
+Z = 100;
+P = A*P0*A'+Q;
+G = P*H'*inv(H*P*H'+R);
+Xkf= X_pre+G*(Z-H*X_pre);
+P0=(I-G*H)*P;

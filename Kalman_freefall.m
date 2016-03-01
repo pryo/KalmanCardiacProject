@@ -7,16 +7,21 @@ A = [1,1;0,1];%process model for freefall
 X(:,1) = [95;1];%initial state height 95m, speed 1m/s
 B=[0.5;1];
 U=-1;
-Q=[10,0;0,10]; %process noise covariance;
-R = 0;%observation noise covariance
+Q=[16,0;0,100]; %process noise covariance;
+R = 2;%observation noise covariance
 W = sqrt(Q)*randn(2,N);%process noise
 V=sqrt(R)*randn(1,N);%observation noise
 for k=2:N
     X(:,k)= A*X(:,k-1)+B*U+W(k);
 end
 H = [1,0];
-[err_P,Z,Xkf] = kf(A,B,U,H,X,Q,R,V);
-
+converged_gain =zeros(2,101);
+for k =1:101
+     Q(2,2) = (k-1);
+    [err_P,Z,Xkf,Gains] = kf(A,B,U,H,X,Q,R,V);
+    converged_gain(:,k)=Gains(:,1000);
+end
+%[err_P,Z,Xkf,Gains] = kf(A,B,U,H,X,Q,R,V);
 for k =1:N
     measure_err(k) = Z(k)-X(1,k);
     kalman_err_x(k)= Xkf(1,k)-X(1,k);

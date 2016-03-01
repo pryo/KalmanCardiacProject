@@ -1,4 +1,4 @@
-function [err_P,measure,state_kf] = kf (A,B,U,transfer_matrix,state,Q,R,V)
+function [err_P,measure,state_kf,Gains] = kf (A,B,U,transfer_matrix,state,Q,R,V)
 nodeNum = size(transfer_matrix,1);
 w = sqrt(nodeNum);
 cellNum = size(state,1);
@@ -15,7 +15,7 @@ H = transfer_matrix;
 %X = zeros(cellNum,time);% true state stroage sequence
 X = state;%assign the state sequence to the model
 %X(:,1) = reshape(reshape([ones(w),ones(cellNum-w)],w,w),cellNum,1);%initialize the tissue
-P0 = [10 0;0 1];
+P0 = [0 0;0 0];
 %P0 = 0.25*eye(cellNum);% covriance matrix
 Z = zeros(nodeNum,time);%the observation sequence
 Z(:,1)= H*X(:,1); %initialize observation
@@ -29,18 +29,21 @@ covA =1;
 randomA=sqrt(covA)*randn(2,2,time);
 covB =1;
 randomB=sqrt(covB)*randn(2,1,time);
+Gains = zeros(2,time);
 for k=2:time
-    A = [1,1;0,1]+randomA(:,:,k);
-    B = [0.5;1]+randomB(:,:,k);
+    A = [1,1;0,1];
+    B = [0.5;1];
     Z(:,k)= H*X(:,k)+V(k);%ovservation vector for one time instance
     %kalman filtering
     X_pre=A*Xkf(:,k-1)+B*U;% prediction of state
     P_pre = A*P0*A'+Q;% prediction of covriance
     Kg = P_pre*H'*inv(H*P_pre*H'+R);%kalman gain
+    Gains(:,k)=Kg;
     Xkf(:,k)= X_pre+Kg*(Z(k)-H*X_pre);%state innovation
     P0=(I-Kg*H)*P_pre;%covariance innovation
     err_P(k,:) = (P0*ones(cellNum,1));%store the error covariance
 end
+save('gains.mat','Gains');
 state_kf=Xkf;
 measure = Z;
 end

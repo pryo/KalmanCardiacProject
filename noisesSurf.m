@@ -1,5 +1,5 @@
 Q1 = 0:1:100;
-Q2 = 0:1:100;
+Q2 = 0:0.005:0.5; %speed cov zoomed  times
 R=100;
 
 pos_err=zeros(size(Q1,2),size(Q2,2));
@@ -18,20 +18,20 @@ for i=1:size(Q1,2)
     end
 end
 
-figure
-subplot(2,2,1)
-surf(pos_err)
-title('pos_err')
-subplot(2,2,2)
-surf(speed_err)
-title('speed_err')
-subplot(2,2,3)
-surf(pos_cov)
-title('pos_cov')
-subplot(2,2,4)
-surf(speed_cov)
-title('speed_cov')
-
+% figure
+% subplot(2,2,1)
+% surf(pos_err)
+% title('pos_err')
+% subplot(2,2,2)
+% surf(speed_err)
+% title('speed_err')
+% subplot(2,2,3)
+% surf(pos_cov)
+% title('pos_cov')
+% subplot(2,2,4)
+% surf(speed_cov)
+% title('speed_cov')
+% 
 
 
 
