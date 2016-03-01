@@ -68,8 +68,8 @@ addpath(genpath(pwd));
 
 if mod(length(varargin),2), error('Initialization error');end
 if nargin == 0, class = 'plane'; end
-if nargin < 2, W = 16; end 
-if nargin < 3, W_e = 12; end 
+if nargin < 2, W = 9; end 
+if nargin < 3, W_e = 4; end 
 if nargin < 4, sim_time  = 1; end
 
 % Tissue dimensions
@@ -231,21 +231,21 @@ CardiacSignal   = zeros(size(transfer_matrix,1),sim_time*FsSignal+1);
 %   INVERSE SOLUTION
 %   ------------------
 
-A   = transfer_matrix;
-ncA = size(A,2);
-L   = eye(ncA,ncA); 
-L2  = L*L';
-A2  = A'*A;
-lambda  = 0.002;
-
-%M_inv=inv(A2+topt*L2)*A';
-
-B       = A2+lambda*L2;
-M_inv   = B\A.';
-
-VIP     = zeros(size(TMP));
-
-
+% A   = transfer_matrix;
+% ncA = size(A,2);
+% L   = eye(ncA,ncA); 
+% L2  = L*L';
+% A2  = A'*A;
+% lambda  = 0.002;
+% 
+% %M_inv=inv(A2+topt*L2)*A';
+% 
+% B       = A2+lambda*L2;
+% M_inv   = B\A.';
+% 
+% VIP     = zeros(size(TMP));
+% 
+% 
 
 
 
@@ -310,14 +310,14 @@ while t<sim_time
         if (mod(t_mes,FsSim/FsFrame)==0)
             if t_mes>0, TMP(:,round(t_mes/(FsSim/FsFrame))) = V; end
         end
-        VIPtemp=M_inv*CardiacSignal(:,Frame_index);
-        VIP(:,Frame_index)  = VIPtemp;
-       delay     = SetParameter(0,'errorDelay',varargin{:});
-        
-       if Frame_index-delay>0
-        errors(1,Frame_index)= frame_by_frame(V,VIP(:,Frame_index-delay));end
-        % intriculate error pre-frame into error vector 
-       
+%         VIPtemp=M_inv*CardiacSignal(:,Frame_index);
+%         VIP(:,Frame_index)  = VIPtemp;
+%        delay     = SetParameter(0,'errorDelay',varargin{:});
+%         
+%        if Frame_index-delay>0
+%         errors(1,Frame_index)= frame_by_frame(V,VIP(:,Frame_index-delay));end
+%         % intriculate error pre-frame into error vector 
+%        
        
         
         Frame_index         = Frame_index+1;
@@ -339,15 +339,18 @@ toc
 % %% kalman
 % kalmanResult=kf(transfer_matrix,V_frame);
 % save('KalmanResult.mat','kalmanResult');
-
+deltaIndex = 26;
+lambda = 1;
+ThreshHold = 83.5;
+estimation = DMKalman(Vref,connectivity,transfer_matrix,CardiacSignal,V_frame,ThreshHold,deltaIndex,lambda);
 
 %%   VIDEO
-save('VIP.mat','VIP');
+save('DMKresult.mat','estimation');
 if nargout==0
     if ~isempty(transfer_matrix)
-        video_CAM(TMP,VIP,transfer_matrix(:,1),CardiacSignal(1,:),FsSignal,FsSignal/10);
+        video_CAM(TMP,estimation,transfer_matrix(:,1),CardiacSignal(1,:),FsSignal,FsSignal/10);
     else
-        video_CAM(TMP,VIP,[],CardiacSignal(1,:),FsSignal,FsSignal/10);
+        video_CAM(TMP,estimation,[],CardiacSignal(1,:),FsSignal,FsSignal/10);
     end
 else
     EGM = CardiacSignal;   

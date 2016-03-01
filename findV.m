@@ -15,16 +15,21 @@ while length(seq)>2
         head = midIndex;
         tail = midIndex;
     end
-seq =vref(head:tail);
+    seq =vref(head:tail);
 end
-if abs(seq(1)-voltage)-abs(seq(2)-voltage)>0
-    index =tail;
-else 
-    index = head;
+if length(seq)>1
+    
+    if abs(seq(1)-voltage)-abs(seq(2)-voltage)>0
+        index =tail;
+    else
+        index = head;
+    end
+else
+    index = tail;
 end
 end
 
 
 
-        
+
 
