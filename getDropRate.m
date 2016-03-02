@@ -5,9 +5,11 @@ for i = 1:length(state)
     index=findV(vref,state(i));
     if (index+deltaIndex)<5000
         nextV = vref(index+deltaIndex);
+        dropRate(i) = nextV/vref(index);
     else
-        nextV = vref(5000);
+        dropRate(i) = 1;
+        
     end
-    dropRate(i) = nextV/vref(index);
+    
 end
 end

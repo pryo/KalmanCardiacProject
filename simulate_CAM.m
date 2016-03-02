@@ -69,8 +69,8 @@ addpath(genpath(pwd));
 if mod(length(varargin),2), error('Initialization error');end
 if nargin == 0, class = 'plane'; end
 if nargin < 2, W = 9; end 
-if nargin < 3, W_e = 4; end 
-if nargin < 4, sim_time  = 1; end
+if nargin < 3, W_e = 3; end 
+if nargin < 4, sim_time  = 0.5; end
 
 % Tissue dimensions
 tissue_size = W*W;
@@ -340,9 +340,12 @@ toc
 % kalmanResult=kf(transfer_matrix,V_frame);
 % save('KalmanResult.mat','kalmanResult');
 deltaIndex = 26;
-lambda = 1;
-ThreshHold = 83.5;
-estimation = DMKalman(Vref,connectivity,transfer_matrix,CardiacSignal,V_frame,ThreshHold,deltaIndex,lambda);
+lambda = 10;
+
+excitable_threshold=-83;
+exciting_threshold=44;
+estimation = DMKalman(Vref,connectivity,transfer_matrix,CardiacSignal,V_frame,...
+    excitable_threshold,exciting_threshold,deltaIndex,lambda);
 
 %%   VIDEO
 save('DMKresult.mat','estimation');
