@@ -4,8 +4,10 @@ nodeNum = size(transfer_matrix,1);
 %w = sqrt(nodeNum);
 cellNum = size(transfer_matrix,2);
 time=size(states,2); %the length of state sequence over time
-Q = zeros(cellNum,cellNum);%process noise is 0
-R=zeros(nodeNum,nodeNum);%obsevation noise is zero
+%Q = zeros(cellNum,cellNum);%process noise is 0
+Q = 10*diag(ones(1,cellNum));
+R = 10*eye(nodeNum);
+%R=zeros(nodeNum,nodeNum);%obsevation noise is zero
 %W=0;
 %V=zeros(nodeNum,1);%observation erro will be zero for now
 %process model
@@ -40,15 +42,17 @@ for k=3:time
     %kalman filtering
     X_pre=A*Xkf(:,k-1)+B*Xkf(:,k-1);% prediction of state
     P_pre = A*P0*A'+Q;% prediction of covriance
-    %Kg = P_pre*H'*inv(H*P_pre*H'+R);%kalman gain last term Sk
-%     Kg = (H*P_pre*H'+R)*(H*P_pre*H'+R)'+lambda*lambda*...
-%        inv((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)')*(H*P_pre*H'+R)*H*P_pre;
-   %regularised gain setting 1
-%    Kg = (((H*P_pre*H'+R)*(H*P_pre*H'+R)'+(lambda*lambda).*...
-%        ((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)'))\(H*P_pre*H'+R)*H*P_pre)';
-   %reged gain setting 2
-   Kg=zeros(cellNum,nodeNum);
-   %gain setting 3
+    Kg = P_pre*H'*inv(H*P_pre*H'+R);%kalman gain last term Sk
+    %Kg = (H*P_pre*H'+R)*(H*P_pre*H'+R)'+lambda*lambda*...
+    %        inv((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)')*(H*P_pre*H'+R)*H*P_pre;
+    %regularised gain setting 1
+    %Kg = (((H*P_pre*H'+R)*(H*P_pre*H'+R)'+(lambda*lambda).*...
+    %    ((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)'))\(H*P_pre*H'+R)*H*P_pre)';
+    %reged gain setting 2
+    %   Kg=zeros(cellNum,nodeNum);
+    %gain setting 3
+    
+    %gain setting 4
     %Gains(:,k)=Kg;
     Xkf(:,k)= X_pre+Kg*(Z(:,k)-H*X_pre);%state innovation last term yk
     P0=(I-Kg*H)*P_pre;%covariance innovation
