@@ -1,6 +1,6 @@
 function controlMatrix=getControlMatrix(vref,connectivity,state,deltaT,excitable_threshold,exciting_threshold)
     width = sqrt(size(connectivity,1)); 
-    excitedV=44.6639;
+    excitedV=128.2198;
     controlMatrix = zeros(size(connectivity,1),size(connectivity,1));
     for i =1:size(controlMatrix,1)
        if state(i)< excitable_threshold

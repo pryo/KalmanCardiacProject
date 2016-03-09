@@ -68,7 +68,7 @@ for nT=1:nn:length(V(1,:))-10
     figure(fa);subplot(221)
     Vsurf = reshape(double(V(:,nT)),W,W);
     surf(x,y,Vsurf)
-    view(45,45)
+    %view(45,45)
     shading interp
     axis square
     caxis([mm mx]);
@@ -79,10 +79,10 @@ for nT=1:nn:length(V(1,:))-10
     figure(fa);subplot(222)
     Vsurf = reshape(double(VIP(:,nT)),W,W);%it seems to be error that it should be VIP
     surf(x,y,Vsurf)
-    view(45,45)%try to look at the plot from differernt prespective
+    %view(45,45)%try to look at the plot from differernt prespective
     shading interp
     axis square
-    caxis([-50 50]);% 50 above seems unused
+    caxis([0 120]);% 50 above seems unused
     colorbar
     axis([0 W-1 0 W-1]);
     title('Estimated (IP) voltage')

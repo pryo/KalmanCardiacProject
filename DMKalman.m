@@ -5,8 +5,8 @@ nodeNum = size(transfer_matrix,1);
 cellNum = size(transfer_matrix,2);
 time=size(states,2); %the length of state sequence over time
 %Q = zeros(cellNum,cellNum);%process noise is 0
-Q = 10*diag(ones(1,cellNum));
-R = 10*eye(nodeNum);
+Q = 100*diag(ones(1,cellNum));
+R = eye(nodeNum);
 %R=zeros(nodeNum,nodeNum);%obsevation noise is zero
 %W=0;
 %V=zeros(nodeNum,1);%observation erro will be zero for now
@@ -18,8 +18,8 @@ H = transfer_matrix;
 %X = zeros(cellNum,time);% true state stroage sequence
 %X = states;%assign the state sequence to the model
 %X(:,1) = reshape(reshape([ones(w),ones(cellNum-w)],w,w),cellNum,1);%initialize the tissue
-% P0 = [0 0;0 0];
-P0 = zeros(cellNum,cellNum);% covriance matrix
+P0 = Q;
+%P0 = zeros(cellNum,cellNum);% covriance matrix
 Z = observations;%the observation sequence
 %Z(:,1)= H*X(:,1); %initialize observation
 Xkf = zeros(cellNum,time);% state estimate initialize
@@ -34,6 +34,7 @@ I = eye(cellNum);
 %covB =1;
 %randomB=sqrt(covB)*randn(2,1,time);
 %Gains = zeros(2,time);
+
 for k=3:time
     A = diag(getDropRate(Vref,Xkf(:,k-1),deltaIndex));
     
@@ -46,8 +47,8 @@ for k=3:time
     %Kg = (H*P_pre*H'+R)*(H*P_pre*H'+R)'+lambda*lambda*...
     %        inv((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)')*(H*P_pre*H'+R)*H*P_pre;
     %regularised gain setting 1
-    %Kg = (((H*P_pre*H'+R)*(H*P_pre*H'+R)'+(lambda*lambda).*...
-    %    ((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)'))\(H*P_pre*H'+R)*H*P_pre)';
+%     Kg = (((H*P_pre*H'+R)*(H*P_pre*H'+R)'+(lambda*lambda).*...
+%        ((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)'))\(H*P_pre*H'+R)*H*P_pre)';
     %reged gain setting 2
     %   Kg=zeros(cellNum,nodeNum);
     %gain setting 3
@@ -57,6 +58,7 @@ for k=3:time
     Xkf(:,k)= X_pre+Kg*(Z(:,k)-H*X_pre);%state innovation last term yk
     P0=(I-Kg*H)*P_pre;%covariance innovation
     err_P(k,:) = (P0*ones(cellNum,1));%store the error covariance
+    clc,disp(['generating estimation for ' num2str(k) ' msec']);
 end
 estimation = Xkf;
 end
