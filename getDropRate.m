@@ -1,5 +1,7 @@
 function dropRate = getDropRate(vref,state,deltaIndex)
 dropRate = zeros(1,size(state,1));
+
+
 for i = 1:length(state)
     
     index=findV(vref,state(i));

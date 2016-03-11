@@ -2,6 +2,7 @@ function controlMatrix=getControlMatrix(vref,connectivity,state,deltaT,excitable
     width = sqrt(size(connectivity,1)); 
     excitedV=128.2198;
     controlMatrix = zeros(size(connectivity,1),size(connectivity,1));
+    
     for i =1:size(controlMatrix,1)
        if state(i)< excitable_threshold
         if connectivity(i,1)~=0&&state(i+1)<exciting_threshold(1)&&state(i+1)>exciting_threshold(2)%&&state(i+1)>exciting_threshold

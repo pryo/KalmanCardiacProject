@@ -68,7 +68,7 @@ addpath(genpath(pwd));
 
 if mod(length(varargin),2), error('Initialization error');end
 if nargin == 0, class = 'S1-S2'; end
-if nargin < 2, W = 101; end 
+if nargin < 2, W = 64; end 
 if nargin < 3, W_e = 4; end 
 if nargin < 4, sim_time  = 1; end
 
