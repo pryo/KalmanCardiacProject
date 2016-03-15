@@ -9,7 +9,7 @@ function video_CAM(V,VIP,MSD,EGM, FsE, FsV)
 
 
 
-mov=VideoWriter('Animation.avi');
+mov=VideoWriter('AnimationGPU.avi');
 open(mov);
 
 W= sqrt(size(V,1));

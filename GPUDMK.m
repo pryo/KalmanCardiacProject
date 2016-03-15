@@ -3,6 +3,7 @@ function Xkf= DMKalman(Vref,connectivity,transfer_matrix,observations,states,...
 %in this versio of DMK algotirhm I will put following variables into
 %gpu:---they are transfer matrix,observation, first couple of state of
 %states,Q,R, A, B
+unitV = 3;
 g=gpuDevice(1);
 wait(g);
 nodeNum = size(transfer_matrix,1);
@@ -27,7 +28,7 @@ time=size(states,2); %the length of state sequence over time
 %P0 = zeros(cellNum,cellNum);% covriance matrix
 %Z = observations;%the observation sequence
 %Z(:,1)= H*X(:,1); %initialize observation
-%Xkf = zeros(cellNum,time,'gpuArray');% state estimate initialize
+Xkf = zeros(cellNum,time,'single');% state estimate initialize
 %Xkf(:,1) = zeros(size(X(:,1)));
 Xkf(:,1) = states(:,1);
 Xkf(:,2) = states(:,2);
@@ -42,19 +43,19 @@ Xkf(:,2) = states(:,2);
 %Gains = zeros(2,time);
 
 for k=3:time
-    Q = 100*diag(ones(1,cellNum,'gpuArray'));
-    R = eye(nodeNum,'gpuArray');
-    H = gpuArray(transfer_matrix);
+    Q = 10000*diag(ones(1,cellNum,'single','gpuArray'));
+    R = eye(nodeNum,'single','gpuArray');
+    H = gpuArray(single(transfer_matrix));
     P0 = Q;
-    I = eye(cellNum);
+    I = eye(cellNum,'single');
     A = diag(getDropRate(Vref,Xkf(:,k-1),deltaIndex));
     
     B = getControlMatrix(Vref,connectivity,Xkf(:,k-1),deltaIndex,excitable_threshold,exciting_threshold);
-    A = gpuArray(A);
+    A = gpuArray(single(A));
     
-    B = gpuArray(B);
-    gXkf=gpuArray(Xkf(:,k-1));
-    Z=gpuArray(observations(:,k));
+    B = gpuArray(single(B));
+    gXkf=gpuArray(single(Xkf(:,k-1)));
+    Z=gpuArray(single(observations(:,k)));
     
     %Z(:,k)= H*X(:,k)+V(k);%ovservation vector for one time instance
     %kalman filtering
@@ -72,11 +73,19 @@ for k=3:time
     
     %gain setting 4
     %Gains(:,k)=Kg;
-    gXkf= X_pre+Kg*(Z-H*X_pre);%state innovation last term yk
+    diff=Z-H*X_pre;
+    gXkf= X_pre+Kg*(diff);%state innovation last term yk
     
     P0=(I-gather(Kg*H))*gather(P_pre);%covariance innovation
     %err_P(k,:) = (P0*ones(cellNum,1));%store the error covariance
     Xkf(:,k) = gather(gXkf);
+    if sum(gather(diff))>0&&exciting_threshold(1)<140 %model too slow
+        exciting_threshold=exciting_threshold+unitV; 
+      % moving up the exciting window to speed up
+    elseif sum(gather(diff))<0&&exciting_threshold(2)>50
+         exciting_threshold=exciting_threshold-unitV; 
+        % moving down the exciting window to gain delay
+    end
     reset(g);
     wait(g);
     clc,disp(['generating estimation for ' num2str(k) ' msec']);
