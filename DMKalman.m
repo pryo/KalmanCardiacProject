@@ -1,12 +1,12 @@
-function estimation= DMKalman(Vref,connectivity,transfer_matrix,observations,states,...
+function Xkf= DMKalman(initQ,initR,Vref,connectivity,transfer_matrix,observations,states,...
     excitable_threshold,exciting_threshold,deltaIndex,lambda)
 nodeNum = size(transfer_matrix,1);
 %w = sqrt(nodeNum);
 cellNum = size(transfer_matrix,2);
 time=size(states,2); %the length of state sequence over time
 %Q = zeros(cellNum,cellNum);%process noise is 0
-Q = 3600*diag(ones(1,cellNum));
-R = eye(nodeNum);
+Q = initQ*diag(ones(1,cellNum));
+R = initR*eye(nodeNum);
 %R=zeros(nodeNum,nodeNum);%obsevation noise is zero
 %W=0;
 %V=zeros(nodeNum,1);%observation erro will be zero for now
@@ -38,11 +38,14 @@ I = eye(cellNum);
 for k=3:time
     A = diag(getDropRate(Vref,Xkf(:,k-1),deltaIndex));
     
-    B = getControlMatrix(Vref,connectivity,Xkf(:,k-1),deltaIndex,excitable_threshold,exciting_threshold);
-    %Z(:,k)= H*X(:,k)+V(k);%ovservation vector for one time instance
+    B = getControlMatrix(Vref,connectivity,Xkf(:,k-1),...
+        deltaIndex,excitable_threshold,exciting_threshold);
+   
     %kalman filtering
     X_pre=A*Xkf(:,k-1)+B*Xkf(:,k-1);% prediction of state
+    A=A+B;
     P_pre = A*P0*A'+Q;% prediction of covriance
+    
     Kg = P_pre*H'*inv(H*P_pre*H'+R);%kalman gain last term Sk
     %Kg = (H*P_pre*H'+R)*(H*P_pre*H'+R)'+lambda*lambda*...
     %        inv((Z(:,k)-H*X_pre)*(Z(:,k)-H*X_pre)')*(H*P_pre*H'+R)*H*P_pre;
@@ -55,10 +58,15 @@ for k=3:time
     
     %gain setting 4
     %Gains(:,k)=Kg;
+    
     Xkf(:,k)= X_pre+Kg*(Z(:,k)-H*X_pre);%state innovation last term yk
+    if Xkf(:)<0
+        Xkf(:)=0;
+    else
+    end
+        
     P0=(I-Kg*H)*P_pre;%covariance innovation
     err_P(k,:) = (P0*ones(cellNum,1));%store the error covariance
     clc,disp(['generating estimation for ' num2str(k) ' msec']);
 end
-estimation = Xkf;
 end

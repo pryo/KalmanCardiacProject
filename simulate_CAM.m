@@ -68,8 +68,8 @@ addpath(genpath(pwd));
 
 if mod(length(varargin),2), error('Initialization error');end
 if nargin == 0, class = 'plane'; end
-if nargin < 2, W = 24; end 
-if nargin < 3, W_e = 6; end 
+if nargin < 2, W = 16; end 
+if nargin < 3, W_e =8; end 
 if nargin < 4, sim_time  = 1; end
 
 % Tissue dimensions
@@ -330,7 +330,7 @@ while t<sim_time
     
     t   = t+Dt;
 end
-save('actual signal.mat','V_frame');
+%save('actual signal.mat','V_frame');
 
 % plot(errors);
 % axis([0 2000 0.99 1]);
@@ -343,17 +343,22 @@ deltaIndex = 26;
 lambda = 1;
 
 excitable_threshold=20;
-exciting_threshold=[125,100];%exciting voltage(upper limits, lower limits)
-estimation = GPUDMK(Vref,connectivity,transfer_matrix,CardiacSignal,V_frame,...
-    excitable_threshold,exciting_threshold,deltaIndex,lambda);
-
+exciting_threshold=[125,110];%exciting voltage(upper limits, lower limits)
+initQ =4096;
+initR =10;
+% estimation = GPUDMK(Vref,connectivity,transfer_matrix,CardiacSignal,V_frame,...
+%     excitable_threshold,exciting_threshold,deltaIndex,lambda);
+%  
+estimation = DMKalman(initQ,initR,Vref,connectivity,transfer_matrix,CardiacSignal,V_frame,...
+     excitable_threshold,exciting_threshold,deltaIndex,lambda);
+error_plot(W_e,initQ,initR,estimation,V_frame);
 %%   VIDEO
-save('DMKresult.mat','estimation');
+
 if nargout==0
     if ~isempty(transfer_matrix)
-        video_CAM(TMP,estimation,transfer_matrix(:,1),CardiacSignal(1,:),FsSignal,FsSignal/10);
+        video_CAM(W_e,initQ,initR,TMP,estimation,transfer_matrix(:,1),CardiacSignal(1,:),FsSignal,FsSignal/10);
     else
-        video_CAM(TMP,estimation,[],CardiacSignal(1,:),FsSignal,FsSignal/10);
+        video_CAM(W_e,initQ,initR,TMP,estimation,[],CardiacSignal(1,:),FsSignal,FsSignal/10);
     end
 else
     EGM = CardiacSignal;   

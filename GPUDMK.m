@@ -1,4 +1,4 @@
-function Xkf= DMKalman(Vref,connectivity,transfer_matrix,observations,states,...
+function Xkf= GPUDMK(Vref,connectivity,transfer_matrix,observations,states,...
     excitable_threshold,exciting_threshold,deltaIndex,lambda)
 %in this versio of DMK algotirhm I will put following variables into
 %gpu:---they are transfer matrix,observation, first couple of state of
@@ -43,17 +43,18 @@ Xkf(:,2) = states(:,2);
 %Gains = zeros(2,time);
 
 for k=3:time
-    Q = 10000*diag(ones(1,cellNum,'single','gpuArray'));
-    R = eye(nodeNum,'single','gpuArray');
+    Q = 4096*diag(ones(1,cellNum,'single','gpuArray'));
+    R = 10*eye(nodeNum,'single','gpuArray');
     H = gpuArray(single(transfer_matrix));
     P0 = Q;
     I = eye(cellNum,'single');
     A = diag(getDropRate(Vref,Xkf(:,k-1),deltaIndex));
     
     B = getControlMatrix(Vref,connectivity,Xkf(:,k-1),deltaIndex,excitable_threshold,exciting_threshold);
-    A = gpuArray(single(A));
+    A = single(A)+single(B);
+    A = gpuArray(A);
     
-    B = gpuArray(single(B));
+    
     gXkf=gpuArray(single(Xkf(:,k-1)));
     Z=gpuArray(single(observations(:,k)));
     
@@ -82,7 +83,7 @@ for k=3:time
     if sum(gather(diff))>0&&exciting_threshold(1)<140 %model too slow
         exciting_threshold=exciting_threshold+unitV; 
       % moving up the exciting window to speed up
-    elseif sum(gather(diff))<0&&exciting_threshold(2)>50
+    elseif sum(gather(diff))<0&&exciting_threshold(2)>80
          exciting_threshold=exciting_threshold-unitV; 
         % moving down the exciting window to gain delay
     end
